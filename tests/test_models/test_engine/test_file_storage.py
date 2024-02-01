@@ -113,3 +113,45 @@ class TestFileStorage(unittest.TestCase):
         with open("file.json", "r") as f:
             js = f.read()
         self.assertEqual(json.loads(string), json.loads(js))
+
+    @unittest.skipIf(models.storage_t == 'db', "not testing file storage")
+    def test_get_existing_object(self):
+            """Test get method with an existing object"""
+            storage = FileStorage()
+            obj = BaseModel()
+            storage.new(obj)
+            result = storage.get(BaseModel, obj.id)
+            self.assertEqual(result, obj)
+
+    @unittest.skipIf(models.storage_t == 'db', "not testing file storage")
+    def test_get_nonexistent_object(self):
+        """Test get method with a nonexistent object"""
+        storage = FileStorage()
+        result = storage.get(BaseModel, "nonexistent_id")
+        self.assertIsNone(result)
+
+    @unittest.skipIf(models.storage_t == 'db', "not testing file storage")
+    def test_get_with_none_cls(self):
+        """Test get method with None as cls argument"""
+        storage = FileStorage()
+        result = storage.get(None, "some_id")
+        self.assertIsNone(result)
+
+    @unittest.skipIf(models.storage_t == 'db', "not testing file storage")
+    def test_get_with_none_id(self):
+        """Test get method with None as id argument"""
+        storage = FileStorage()
+        result = storage.get(BaseModel, None)
+        self.assertIsNone(result)
+
+    @unittest.skipIf(models.storage_t == 'db', "not testing file storage")
+    def test_count(self):
+        """Test the count method of FileStorage"""
+        storage = FileStorage()
+
+        count_all = storage.count()
+        self.assertEqual(count_all, len(storage.all()))
+        count_amenity = storage.count(Amenity)
+        self.assertEqual(count_amenity, len(storage.all(Amenity)))
+        count_user = storage.count(User)
+        self.assertEqual(count_user, len(storage.all(User)))

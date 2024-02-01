@@ -86,3 +86,75 @@ class TestFileStorage(unittest.TestCase):
     @unittest.skipIf(models.storage_t != 'db', "not testing db storage")
     def test_save(self):
         """Test that save properly saves objects to file.json"""
+
+
+class TestDBStorage(unittest.TestCase):
+    """Tests for the DBStorage class"""
+    @unittest.skipIf(models.storage_t != 'db', "not testing db storage")
+    def test_get_existing_object(self):
+        """Test retrieving an existing object"""
+        storage = DBStorage()
+        obj = BaseModel()
+        storage.new(obj)
+        storage.save()
+        retrieved_obj = storage.get(BaseModel, obj.id)
+        self.assertEqual(retrieved_obj, obj)
+
+    @unittest.skipIf(models.storage_t != 'db', "not testing db storage")
+    def test_get_nonexistent_object(self):
+        """Test retrieving a nonexistent object"""
+        storage = DBStorage()
+        obj = BaseModel()
+        storage.new(obj)
+        storage.save()
+        retrieved_obj = storage.get(BaseModel, "nonexistent_id")
+        self.assertIsNone(retrieved_obj)
+
+    @unittest.skipIf(models.storage_t != 'db', "not testing db storage")
+    def test_get_invalid_class(self):
+        """Test retrieving an object with an invalid class"""
+        storage = DBStorage()
+        obj = BaseModel()
+        storage.new(obj)
+        storage.save()
+        retrieved_obj = storage.get(InvalidClass, obj.id)
+        self.assertIsNone(retrieved_obj)
+
+
+class TestDBStorage(unittest.TestCase):
+    """Tests for the DBStorage class"""
+    @unittest.skipIf(models.storage_t != 'db', "not testing db storage")
+    def test_count_all_objects(self):
+        """Test counting all objects in storage"""
+        storage = DBStorage()
+        obj1 = BaseModel()
+        obj2 = BaseModel()
+        storage.new(obj1)
+        storage.new(obj2)
+        storage.save()
+        count = storage.count()
+        self.assertEqual(count, 2)
+
+    @unittest.skipIf(models.storage_t != 'db', "not testing db storage")
+    def test_count_objects_by_class(self):
+        """Test counting objects by class in storage"""
+        storage = DBStorage()
+        obj1 = BaseModel()
+        obj2 = BaseModel()
+        storage.new(obj1)
+        storage.new(obj2)
+        storage.save()
+        count = storage.count(BaseModel)
+        self.assertEqual(count, 2)
+
+    @unittest.skipIf(models.storage_t != 'db', "not testing db storage")
+    def test_count_objects_by_invalid_class(self):
+        """Test counting objects by invalid class in storage"""
+        storage = DBStorage()
+        obj1 = BaseModel()
+        obj2 = BaseModel()
+        storage.new(obj1)
+        storage.new(obj2)
+        storage.save()
+        count = storage.count(InvalidClass)
+        self.assertEqual(count, 0)
